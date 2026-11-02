@@ -1,0 +1,13 @@
+# Experiment record
+
+The search space is the 14 configurations in `configs/study.json`, with a 21-origin refit cadence, a five-session horizon and seed 1729. The initial package version is 1.0.0. No other model configurations were evaluated.
+
+1. Public Yahoo query1 acquisition returned HTTP 429. The public query2 chart endpoint succeeded for all three ETFs; the pipeline uses query2. Raw responses and retrieval receipts remain in the ignored local cache.
+2. Initial acquisition validation stopped at the calendar library because the requested start date was a holiday. Expanding the instantiated calendar's bounds fixed this pre-evaluation issue. A synthetic regression test covers it. No final-test metrics existed at this point.
+3. All 14 candidates were evaluated on purged 2018–2020 validation origins. Negative ridge forecasts were floored at 1e−12 and logged. Signed-return feature variants at low penalties had very large validation QLIKE. Full parameters, optimizer warnings and event counts are retained in validation.json. They are not removed as inconvenient outcomes.
+4. Historical 21, EWMA .94, Student-t GARCH and volatility-only ridge alpha .1 were frozen before evaluating test losses. Exact package source, config and raw-byte hashes are stored in frozen.json.
+5. One final walk-forward evaluation produced 1,000 forecast origins for each of three ETFs and each of four model families: 12,000 forecast rows. There were no final-test failed forecasts or floor events. Prior test labels enter subsequent fits only after becoming observable; hyperparameters stay frozen.
+6. The first report included paired loss intervals against historical variance. A secondary comparison against EWMA was added from the same recorded forecasts using scripts/compare_ewma.py, without model changes or test reruns. Both comparisons use synchronized date blocks of 5, 20 and 60 sessions and 2,000 replicates. scripts/build_report.py reproduces this complete report. The package source hash remains that used during selection and evaluation; the additional reporting scripts are versioned separately in Git.
+7. Nine offline tests passed locally. The only emitted warnings were third-party calendar/pandas timezone deprecation warnings. Package installation and CLI entry point were verified. GitHub CI and Pages deployment statuses are available in repository Actions.
+
+The original holdout has now been examined. New model research should use a new holdout rather than tune on these test results. Exact source identity can be independently recomputed by `volatilitylab.cli.source_digest()`; frozen and final-test identities match.

@@ -1,0 +1,32 @@
+{
+  "identity": {
+    "config_sha256": "e8f75dc0143d26fda28f1cec4fe8bf48b8e5229b33c0425a1227b9cf19aeb4aa",
+    "data_sha256": [
+      "b8bdbae9907b1f274b5fddba06b221fccdb65e4dbd5981f3fdaaeb1ef5ca97bc",
+      "2ad6e03af5fa1333765599471489eaf5ed1c97de5dd6228717af0c71c19229a4",
+      "31dd97c9e6b8708ca7e2d3d9ff200dbea6096f64b23ed20bc4a8b9b6e0cb04d6"
+    ],
+    "source_sha256": "1ef6cce84b99f1218f2501682bfc339738aa76ed33d29a19b84a66001c547891"
+  },
+  "selected": {
+    "historical": {
+      "model": "historical",
+      "window": 21
+    },
+    "ewma": {
+      "model": "ewma",
+      "decay": 0.94
+    },
+    "garch": {
+      "model": "garch",
+      "distribution": "t"
+    },
+    "ridge": {
+      "model": "ridge",
+      "alpha": 0.1,
+      "features": "vol_only"
+    }
+  },
+  "selection": "Equal ETF mean validation QLIKE; no test metrics accessed",
+  "frozen_utc": "2026-11-02T19:22:58.481402+00:00"
+}
