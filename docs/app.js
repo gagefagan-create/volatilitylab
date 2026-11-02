@@ -29,9 +29,12 @@ function intervals(){
 }
 fetch('results/explorer.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(d=>{
  data=d;
- const means=Object.keys(names).map(model=>({model,v:d.metrics.filter(r=>r.model===model).reduce((s,r)=>s+r.qlike,0)/3})).sort((a,b)=>a.v-b.v);
- $('finding').textContent='Complexity offers no clear gain over EWMA.';
- $('finding-detail').textContent=`Ridge leads QLIKE by just 0.0000824 versus EWMA; paired intervals include zero. EWMA has the lowest MSE. Inspect the ETF differences and uncertainty below.`;
+ const means=Object.keys(names).map(model=>({model,v:d.metrics.filter(r=>r.model===model).reduce((s,r)=>s+r.qlike,0)/d.metrics.filter(r=>r.model===model).length})).sort((a,b)=>a.v-b.v);
+ const robustGains=(d.intervals_ewma||[]).filter(r=>['garch','ridge'].includes(r.model)&&Object.values(r.intervals).every(ci=>ci[1]<0));
+ const mseMeans=Object.keys(names).map(model=>({model,v:d.metrics.filter(r=>r.model===model).reduce((s,r)=>s+r.mse,0)/d.metrics.filter(r=>r.model===model).length})).sort((a,b)=>a.v-b.v);
+ $('finding').textContent=robustGains.length?'Paired evidence favors '+robustGains.map(r=>names[r.model]).join(' and ')+' over EWMA.':'Complexity offers no consistent gain over EWMA.';
+ const ridgeComparison=(d.intervals_ewma||[]).find(r=>r.model==='ridge');
+ $('finding-detail').textContent=`${names[means[0].model]} has the lowest aggregate QLIKE (${means[0].v.toFixed(7)}); ${names[mseMeans[0].model]} has the lowest MSE. ${ridgeComparison?'Ridge minus EWMA mean QLIKE: '+ridgeComparison.mean_delta.toFixed(7)+'. ':''}Inspect the ETF differences and descriptive uncertainty below.`;
  $('trials').innerHTML='<table><thead><tr><th>Configuration</th><th>Validation QLIKE</th></tr></thead><tbody>'+d.trials.map(t=>`<tr><td><code>${JSON.stringify(t.configuration)}</code></td><td>${t.validation_qlike===null?'FAILED':t.validation_qlike.toFixed(4)}</td></tr>`).join('')+'</tbody></table>';
  comparison();path();intervals();
  for(const id of ['symbol','metric'])$(id).addEventListener('change',comparison);

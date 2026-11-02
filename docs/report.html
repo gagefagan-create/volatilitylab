@@ -28,7 +28,7 @@
 </table></div>
 <p>Aggregate QLIKE: ridge: 0.3188; ewma: 0.3188; garch: 0.3195; historical: 0.3600.</p>
 <p>QLIKE is y/f − log(y/f) − 1; lower is better, and a perfect proxy forecast scores zero. It penalizes underprediction sharply. MSE is in decimal-return fourth-power units. Both metrics are averaged over identical forecast origins; failed candidates are ineligible during validation and final-test failures stop the run.</p>
-<h2>Comparison with the EWMA baseline</h2><p>Complexity shows no clear improvement over EWMA in this case study. Ridge leads aggregate QLIKE by only 0.0000824; EWMA has the lowest aggregate MSE. Neither ridge nor GARCH has a paired interval against EWMA excluding zero at any tested block length. These descriptive intervals do not establish equivalence.</p><p>This secondary comparison uses the already frozen test forecasts. It adds no model configurations, retuning, refits or test reruns. The original package source hash remains unchanged; scripts/compare_ewma.py records this additional reporting analysis.</p><div class="table-wrap"><table><tr><th>Model</th><th>Mean Δ vs EWMA</th><th>Block 5 CI</th><th>Block 20 CI</th><th>Block 60 CI</th></tr><tr><td>historical</td><td>0.0412074</td><td>[0.02256, 0.06362]</td><td>[0.01983, 0.06570]</td><td>[0.01916, 0.06886]</td></tr><tr><td>garch</td><td>0.0007059</td><td>[-0.01892, 0.01924]</td><td>[-0.02215, 0.02178]</td><td>[-0.02126, 0.01923]</td></tr><tr><td>ridge</td><td>-0.0000824</td><td>[-0.02774, 0.02610]</td><td>[-0.03185, 0.03147]</td><td>[-0.03315, 0.03038]</td></tr></table></div><h2>Dependence-aware uncertainty</h2>
+<h2>Comparison with the EWMA baseline</h2><p>RIDGE has the lowest equal-weight aggregate QLIKE (0.3187575); EWMA has the lowest aggregate MSE (5.338143e-07). No complex model has a descriptive paired interval entirely below zero at every tested block length in this case study; the evidence does not establish a consistent advantage over EWMA.</p><p>GARCH minus EWMA mean QLIKE is 0.0007059 (95% intervals: block 5: [-0.01892, 0.01924]; block 20: [-0.02215, 0.02178]; block 60: [-0.02126, 0.01923]). RIDGE minus EWMA mean QLIKE is -0.0000824 (95% intervals: block 5: [-0.02774, 0.02610]; block 20: [-0.03185, 0.03147]; block 60: [-0.03315, 0.03038]).</p><p>Negative differences favor the model. These are descriptive, selection-conditional intervals without multiple-comparison adjustment. Intervals containing zero do not establish equivalence or rule out useful gains elsewhere.</p><p>This secondary comparison uses the already frozen final-test forecasts to address both simple baselines. It introduces no new model configurations, refits, hyperparameter choices or test reruns. Code: scripts/compare_ewma.py. The primary source hash in frozen.json covers the package as evaluated; these reporting scripts are an additional transparent analysis of its outputs.</p><div class="table-wrap"><table><tr><th>Model</th><th>Mean Δ vs EWMA</th><th>Block 5 CI</th><th>Block 20 CI</th><th>Block 60 CI</th></tr><tr><td>historical</td><td>0.0412074</td><td>[0.02256, 0.06362]</td><td>[0.01983, 0.06570]</td><td>[0.01916, 0.06886]</td></tr><tr><td>garch</td><td>0.0007059</td><td>[-0.01892, 0.01924]</td><td>[-0.02215, 0.02178]</td><td>[-0.02126, 0.01923]</td></tr><tr><td>ridge</td><td>-0.0000824</td><td>[-0.02774, 0.02610]</td><td>[-0.03185, 0.03147]</td><td>[-0.03315, 0.03038]</td></tr></table></div><h2>Dependence-aware uncertainty</h2>
 <p>The paired statistic is each model’s QLIKE minus the selected historical baseline’s QLIKE, first averaged across ETFs for each date. A synchronized circular moving-block bootstrap resamples dates in blocks, preserving ETF correlation and local serial dependence from overlapping five-session targets. We use 2,000 replicates, seed 1729, and 95% percentile intervals at block lengths 5, 20 and 60. Negative deltas favor the model. These are descriptive, unadjusted intervals conditional on validation selection; they are not a multiple-testing-corrected discovery claim, and block length is a sensitivity assumption.</p>
 <div class="table-wrap"><table>
 <tr><td>Model</td><td>Mean Δ QLIKE</td><td>Block 5 CI</td><td>Block 20 CI</td><td>Block 60 CI</td></tr>
@@ -81,13 +81,13 @@ pip install --no-deps -e .
 
 pytest -q
 
-volatilitylab validate --out docs/reproduction
+volatilitylab validate --out reproductions/run1/results
 
-volatilitylab test --out docs/reproduction
+volatilitylab test --out reproductions/run1/results
 
-python scripts/build_report.py --out docs/reproduction
+python scripts/build_report.py --out reproductions/run1/results
 
-python -m http.server 8000 --directory docs
+python -m http.server 8000 --directory reproductions/run1
 
 </code></pre>
 <p>The published directory docs/results is immutable evidence of this run; use a fresh output directory for reproduction. Downloaded inputs cache under ignored data/raw; keep the cache to reproduce exact prices. The registry lock pins the observed environment. The data provider may rate-limit or revise histories; failed downloads stop execution. Exact original data hashes can be checked, but byte-exact reruns require the original local cache because redistribution rights are not assumed. No network is used by the offline tests. All fixtures in tests/fixtures are explicitly synthetic.</p>

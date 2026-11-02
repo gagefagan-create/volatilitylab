@@ -8,7 +8,11 @@ Independent, reproducible research on a concrete question: **Do more complex mod
 
 On SPY, QQQ and IWM in the frozen 2021–2024 test, **RIDGE** has the lowest equal-weight QLIKE: **0.3188**. This selected case study does not establish general model superiority. See the report for each ETF, MSE, paired block-bootstrap uncertainty, all 14 validation configurations, ablations and failure logs. Negative outcomes are retained.
 
-Ridge’s aggregate QLIKE lead over EWMA is only 0.0000824, with a 20-session block-bootstrap interval of [−0.03185, 0.03147]. GARCH also shows no clear gain over EWMA. EWMA has the lowest aggregate MSE. The evidence does not establish an advantage from model complexity.
+RIDGE has the lowest equal-weight aggregate QLIKE (0.3187575); EWMA has the lowest aggregate MSE (5.338143e-07). No complex model has a descriptive paired interval entirely below zero at every tested block length in this case study; the evidence does not establish a consistent advantage over EWMA.
+
+GARCH minus EWMA mean QLIKE is 0.0007059 (95% intervals: block 5: [-0.01892, 0.01924]; block 20: [-0.02215, 0.02178]; block 60: [-0.02126, 0.01923]). RIDGE minus EWMA mean QLIKE is -0.0000824 (95% intervals: block 5: [-0.02774, 0.02610]; block 20: [-0.03185, 0.03147]; block 60: [-0.03315, 0.03038]).
+
+Negative differences favor the model. These are descriptive, selection-conditional intervals without multiple-comparison adjustment. Intervals containing zero do not establish equivalence or rule out useful gains elsewhere.
 
 ![Final test comparison](docs/comparison.svg)
 
@@ -22,13 +26,13 @@ source .venv/bin/activate
 pip install -r requirements-lock.txt
 pip install --no-deps -e .
 pytest -q
-volatilitylab validate --out docs/reproduction
-volatilitylab test --out docs/reproduction
-python scripts/build_report.py --out docs/reproduction
-python -m http.server 8000 --directory docs
+volatilitylab validate --out reproductions/run1/results
+volatilitylab test --out reproductions/run1/results
+python scripts/build_report.py --out reproductions/run1/results
+python -m http.server 8000 --directory reproductions/run1
 ```
 
-Open http://localhost:8000. Test execution requires a frozen validation record with matching config/data/source hashes and refuses to overwrite a test result. Keep `data/raw` locally for exact-input reproduction; Yahoo can revise historical data. A clean re-download may not match the published hashes. Offline tests use only clearly labeled synthetic fixtures.
+Open http://localhost:8000. Each fresh reproduction is rendered as a self-contained site under reproductions/run1, including its own explorer, report, plots and audit links; the published docs/results evidence remains unchanged. Test execution requires a frozen validation record with matching config/data/source hashes and refuses to overwrite a test result. Keep `data/raw` locally for exact-input reproduction; Yahoo can revise historical data. A clean re-download may not match the published hashes. Offline tests use only clearly labeled synthetic fixtures.
 
 ## Architecture
 

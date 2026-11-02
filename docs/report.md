@@ -45,9 +45,13 @@ QLIKE is y/f − log(y/f) − 1; lower is better, and a perfect proxy forecast s
 
 ## Comparison with the EWMA baseline
 
-Complexity shows no clear improvement over EWMA in this case study. Ridge leads aggregate QLIKE by only 0.0000824, while EWMA has the lowest aggregate MSE. At block length 20, ridge minus EWMA QLIKE has a 95% interval of [−0.03185, 0.03147]; GARCH minus EWMA is [−0.02215, 0.02178]. Neither excludes zero at any of the three tested block lengths. These descriptive intervals do not prove equivalence or rule out useful gains elsewhere.
+RIDGE has the lowest equal-weight aggregate QLIKE (0.3187575); EWMA has the lowest aggregate MSE (5.338143e-07). No complex model has a descriptive paired interval entirely below zero at every tested block length in this case study; the evidence does not establish a consistent advantage over EWMA.
 
-This secondary comparison was computed from the already frozen final-test forecasts to address both simple baselines. It introduced no new model configurations, refits, hyperparameter choices or test reruns. Code: scripts/compare_ewma.py. The primary source hash in frozen.json covers the package as evaluated; these reporting scripts are an additional transparent analysis of its outputs.
+GARCH minus EWMA mean QLIKE is 0.0007059 (95% intervals: block 5: [-0.01892, 0.01924]; block 20: [-0.02215, 0.02178]; block 60: [-0.02126, 0.01923]). RIDGE minus EWMA mean QLIKE is -0.0000824 (95% intervals: block 5: [-0.02774, 0.02610]; block 20: [-0.03185, 0.03147]; block 60: [-0.03315, 0.03038]).
+
+Negative differences favor the model. These are descriptive, selection-conditional intervals without multiple-comparison adjustment. Intervals containing zero do not establish equivalence or rule out useful gains elsewhere.
+
+This secondary comparison uses the already frozen final-test forecasts to address both simple baselines. It introduces no new model configurations, refits, hyperparameter choices or test reruns. Code: scripts/compare_ewma.py. The primary source hash in frozen.json covers the package as evaluated; these reporting scripts are an additional transparent analysis of its outputs.
 
 | Model | Mean Δ vs EWMA | Block 5 CI | Block 20 CI | Block 60 CI |
 |---|---:|---|---|---|
@@ -117,10 +121,10 @@ source .venv/bin/activate
 pip install -r requirements-lock.txt
 pip install --no-deps -e .
 pytest -q
-volatilitylab validate --out docs/reproduction
-volatilitylab test --out docs/reproduction
-python scripts/build_report.py --out docs/reproduction
-python -m http.server 8000 --directory docs
+volatilitylab validate --out reproductions/run1/results
+volatilitylab test --out reproductions/run1/results
+python scripts/build_report.py --out reproductions/run1/results
+python -m http.server 8000 --directory reproductions/run1
 ```
 
 The published directory docs/results is immutable evidence of this run; use a fresh output directory for reproduction. Downloaded inputs cache under ignored data/raw; keep the cache to reproduce exact prices. The registry lock pins the observed environment. The data provider may rate-limit or revise histories; failed downloads stop execution. Exact original data hashes can be checked, but byte-exact reruns require the original local cache because redistribution rights are not assumed. No network is used by the offline tests. All fixtures in tests/fixtures are explicitly synthetic.

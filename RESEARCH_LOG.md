@@ -11,3 +11,5 @@ The search space is the 14 configurations in `configs/study.json`, with a 21-ori
 7. Nine offline tests passed locally. The only emitted warnings were third-party calendar/pandas timezone deprecation warnings. Package installation and CLI entry point were verified. GitHub CI and Pages deployment statuses are available in repository Actions.
 
 The original holdout has now been examined. New model research should use a new holdout rather than tune on these test results. Exact source identity can be independently recomputed by `volatilitylab.cli.source_digest()`; frozen and final-test identities match.
+
+8. Independent review found and fixed reporting-only reproduction issues: fresh findings now derive from supplied artifacts, and non-default builds produce self-contained sites without modifying published evidence. Copied-input report generation and artifact isolation were verified without model refits or a test rerun. The package source hash still matches the frozen identity. GitHub offline CI and the initial Pages deployment passed.
